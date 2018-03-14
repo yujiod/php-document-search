@@ -1,0 +1,32 @@
+version: '3'
+services:
+  composer:
+    image: composer
+    volumes:
+      - ./:/app
+    command: bash -c 'if [ ! -d ./vendor ]; then touch exist_composer; composer install; rm exist_composer; fi'
+  php:
+    image: php:7
+    volumes:
+      - ./:/app
+    ports:
+      - 8080:8080
+    depends_on:
+      - composer
+      - postgres
+    working_dir: /app
+    command: bash -c 'while [ -f exist_composer ]; do echo "Waiting composer..."; sleep 5; done; ./bin/start.sh'
+  postgres:
+    image: iquiw/pgroonga-on-postgres
+    environment:
+      POSTGRES_DB: php_document_search
+      POSTGRES_USER: php_document_search_user
+      POSTGRES_PASSWORD: secret
+## When needs startup mysql, enable below lines.
+#    depends_on:
+#      - db
+#  db:
+#    image: mariadb:10.0
+#    environment:
+#      MYSQL_ROOT_PASSWORD: password
+#      MYSQL_MYSQL_DATABASE: alice
