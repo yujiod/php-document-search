@@ -69,6 +69,7 @@ class RegisterDocuments extends Command
     {
         $title_node = $xpath->evaluate('/html/head/title/text()')->item(0);
         if (!$title_node) {
+            $entry->title = 'No title';
             return;
         }
 
